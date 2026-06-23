@@ -1,0 +1,175 @@
+=====================================
+FULL STACK APP BUILDING GUIDELINES
+=====================================
+
+-------------------------------------
+1. REACT FRONTEND
+-------------------------------------
+
+Stack:
+- React 19 with Vite
+- Tailwind CSS for styling
+- React Router v6 for routing
+- Axios for API calls
+- Zustand for state management (lightweight, no boilerplate)
+- React Query for server state / data fetching
+
+File Structure:
+/frontend
+  /src
+    /components      → reusable UI components
+    /pages           → one file per route/page
+    /hooks           → custom React hooks
+    /store           → Zustand store files
+    /api             → all API call functions
+    /utils           → helper functions
+    App.jsx          → main app with routes
+    main.jsx         → entry point
+
+Component Rules:
+- Always use functional components, never class components
+- One component per file
+- Component files use PascalCase → UserCard.jsx
+- Always handle loading and error states
+- Use React Query for any data fetching
+- Never fetch directly inside a component, use /api folder
+
+Naming:
+- Components → PascalCase (UserCard, LoginPage)
+- Hooks → camelCase starting with "use" (useAuth, useFetch)
+- Variables/functions → camelCase
+- Constants → UPPER_SNAKE_CASE
+- CSS classes → kebab-case
+
+Example Component Structure:
+function MyComponent({ prop1, prop2 }) {
+  // 1. hooks first
+  // 2. derived state
+  // 3. handlers
+  // 4. return JSX
+}
+
+-------------------------------------
+2. FASTAPI BACKEND
+-------------------------------------
+
+Stack:
+- FastAPI
+- SQLAlchemy ORM
+- Alembic for migrations
+- Pydantic v2 for validation
+- python-jose for JWT auth
+- passlib for password hashing
+- uvicorn as ASGI server
+
+File Structure:
+/backend
+  /routers         → one file per feature (auth.py, users.py)
+  /models          → SQLAlchemy database models
+  /schemas         → Pydantic request/response schemas
+  /services        → business logic (never put logic in routers)
+  /utils           → helper functions
+  /core
+    config.py      → settings from .env
+    database.py    → DB connection
+    security.py    → auth utilities
+  main.py          → FastAPI app creation, router registration
+
+API Design Rules:
+- Always version APIs → /api/v1/resource
+- Use proper HTTP methods:
+  GET    → fetch data
+  POST   → create new resource
+  PUT    → replace entire resource
+  PATCH  → partial update
+  DELETE → remove resource
+- Always return proper status codes:
+  200 → success
+  201 → created
+  400 → bad request
+  401 → unauthorized
+  404 → not found
+  500 → server error
+- Always use Pydantic schemas for request and response
+- Never put business logic in routers, use services/
+
+Auth Pattern:
+- JWT tokens with access + refresh token pattern
+- Store tokens in httpOnly cookies (not localStorage)
+- Protect routes with FastAPI Depends()
+
+Environment Variables (always use these, never hardcode):
+- DATABASE_URL
+- SECRET_KEY
+- ACCESS_TOKEN_EXPIRE_MINUTES
+- CORS_ORIGINS
+
+-------------------------------------
+3. PYTHON CLI TOOLS
+-------------------------------------
+
+Stack:
+- Typer for CLI interface (built on Click, cleaner syntax)
+- Rich for beautiful terminal output
+- Pydantic for config validation
+- python-dotenv for environment variables
+- uv for package management
+
+File Structure:
+/mytool
+  /commands        → one file per command group
+  /utils           → helper functions
+  /models          → Pydantic models
+  config.py        → settings
+  main.py          → CLI entry point
+
+CLI Rules:
+- Use Typer for all CLI argument/option parsing
+- Use Rich for all terminal output (tables, colors, progress bars)
+- Always add --help descriptions to every command
+- Always validate input with Pydantic before processing
+- Use typer.echo() for simple output, Rich Console for complex output
+- Always handle errors gracefully with try/except and Rich error messages
+
+-------------------------------------
+4. GENERAL RULES (ALL PROJECTS)
+-------------------------------------
+
+Code Style:
+- Keep functions small → max 20-30 lines per function
+- One function = one job
+- Always add error handling (try/except in Python, try/catch in JS)
+- Use environment variables for ALL secrets and config
+- Never commit .env files
+- Always use async/await for I/O operations
+
+Git:
+- Commit messages → "type: short description"
+  Types: feat, fix, docs, style, refactor, test
+- One feature per branch
+- Always use .gitignore
+
+Security:
+- Never hardcode API keys or passwords
+- Always validate user input
+- Use HTTPS in production
+- Hash passwords with bcrypt (never store plain text)
+- Sanitize all database inputs (use ORM, never raw SQL strings)
+
+Performance:
+- Lazy load React components with React.lazy()
+- Use pagination for large data sets
+- Cache expensive API calls with React Query
+- Use database indexes on frequently queried columns
+
+Testing:
+- Python → pytest
+- React → Vitest + React Testing Library
+- Always test happy path + error cases
+- Aim for 70%+ coverage on critical paths
+
+Deployment:
+- Frontend → Vercel (free, instant deploys)
+- Backend → Railway or Render (free tier available)
+- Database → Supabase (free PostgreSQL) or PlanetScale
+- Environment variables → set in platform dashboard, never in code
