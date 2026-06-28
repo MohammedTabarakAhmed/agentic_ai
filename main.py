@@ -7,15 +7,26 @@ user_goal=input("What app do you want to build?")
 
 initial_state = {
     "user_goal": user_goal,
-    "active_agent": "supervisor", #start at supervisor
+    "active_agent": "supervisor",
     "retrieved_docs": [],
     "search_results": [],
     "app_plan": "",
     "generated_files": {},
-    "is_complete": False
+    "is_complete": False,
+    "plan_steps": [],
+    "review_feedback": "",
+    "execution_result": "",
+    "execution_error": "",
+    "retry_count": 0,
+    "memory": []
 }
 
-#run the graph
+#run the graph stream to see progress
+for step in app.stream(initial_state):
+    print(step)
+    print("---")
+
+#invoke to get final result
 result = app.invoke(initial_state)
 
 #output folder

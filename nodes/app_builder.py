@@ -41,29 +41,42 @@ llm=ChatGroq(model="llama-3.3-70b-versatile")
 def app_builder(state: AgentState):
     #code
     prompt = f"""
-    You are an expert app builder in a faanf/maang really  high senior developer.
+        You are an expert app builder, FAANG senior developer.
 
-    User wants: {state['user_goal']}
+        User wants: {state['user_goal']}
 
-    Research from web: {state['search_results']}
+        Development plan to follow: {state['plan_steps']}
 
-    Relevant docs: {state['retrieved_docs']}
+        Research from web: {state['search_results']}
 
-    Generate all necessary files for this app.
-    Reply ONLY with a JSON object like this:
-    {{
+        Relevant docs: {state['retrieved_docs']}
+
+        Previous review feedback (if any): {state['review_feedback']}
+        This is attempt number: {state['retry_count']}
+
+        If review feedback exists, fix those specific issues.
+        If this is a retry, improve on previous attempt.
+
+        Generate all necessary files for this app.
+        Reply ONLY with a JSON object like this:
+        {{
         "filename.py": "code here",
         "index.html": "code here",
         "styles.css": "code here"
-    }}
-    No explanation. Just the JSON.
-    """
+        }}
+        No explanation. Just the JSON.
+        """
+    
     response=llm.invoke([
         SystemMessage(content='You are a senior SWE that can build web sites and application better than anyone.'),
         HumanMessage(content=prompt)
     ])
+
     content = response.content.strip()
     content = content.replace("```json", "").replace("```", "").strip() #json issue 
     generated_files = json.loads(content, strict=False)
-    return {"generated_files": generated_files}
+    return {
+    "generated_files": generated_files,
+    "retry_count": state['retry_count'] + 1
+}
 
