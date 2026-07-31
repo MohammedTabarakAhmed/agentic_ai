@@ -66,10 +66,10 @@ def supervisor(state: AgentState):
     
     if not state['plan_steps']:
         return {"active_agent": "planner"}
-    elif not state['search_results']:
-        return {"active_agent": "web"}
-    elif not state['retrieved_docs']:
+    elif not state['retrieved_docs'] and not state['generated_files']:
         return {"active_agent": "rag"}
+    elif state.get('retry_count', 0) >= 3 and state.get('generated_files'):
+        return {"active_agent": "done"}
     elif not state['generated_files']:
         return {"active_agent": "app_builder"}
     elif not state['review_feedback']:

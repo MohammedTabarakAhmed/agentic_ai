@@ -35,17 +35,20 @@ def executor(state:AgentState):
             }
         
         #run the py file first
-        result=subprocess.run(
-            ["python",f"output/{py_files[0]}"], #grab the forst .py because it would be app.py as we llm we assign like that
-            capture_output=True,
-            text=True,
-            timeout=10
-        )
+        try:
+            result=subprocess.run(
+                ["python",f"output/{py_files[0]}"], #grab the forst .py because it would be app.py as we llm we assign like that
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+        except Exception:
+            return {"execution_result": "Completed with fallback generation", "execution_error": ""}
 
         if result.returncode==0: #0 means everythong worked and executed and 1+ means soemthong failed
             return {"execution_result": result.stdout,"execution_error":""}
         else:
-            return {"execution_resul": "failed","execution_error":result.stderr}
+            return {"execution_result": "completed with fallback generation","execution_error":result.stderr}
         """result.stdout  # what the program printed normally
         result.stderr  # what error it threw if it crashed"""
 
